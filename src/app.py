@@ -11,11 +11,10 @@ play_height = height/5
 is_stopped = False
 
 # These are the codes that pygame uses, I am not sure what format it is
-black = 0
-red = 16386570
-blue = 658170
-color_arr = [black, red, blue]
-
+dark_green = (0 << 16) | (50 << 8) | 0
+red = (139 << 16) | (0 << 8) | 0
+blue = (0 << 16) | (0 << 8) | 100
+color_arr = [dark_green, red, blue]
 pygame.init()
 screen = pygame.display.set_mode(size)
 pp = engine.Map()

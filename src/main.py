@@ -4,23 +4,26 @@ from datetime import datetime
 
 def main():
     game_map = pps.Map()
-    num_turns = 500
+    num_turns = 200
 
     prey_counts = []
     predator_counts = []
+    empty_count = []
 
     print(f"Running {num_turns} turns...")
     for turn in range(num_turns):
         if (turn+1) % (num_turns // 5) == 0:
             print(f"Turn {turn+1}/{num_turns}")        
         game_map.turn()
-        prey, predator = game_map.count_species()
+        empty, prey, predator = game_map.count_species()
+        empty_count.append(empty)
         prey_counts.append(prey)
         predator_counts.append(predator)
         # time.sleep(0.5)  # Removed for faster execution when not viewing interactively
 
     # Plotting the results
     print("Done with simulation")
+    plt.plot(empty_count, label='Grass')
     plt.plot(prey_counts, label='Prey')
     plt.plot(predator_counts, label='Predator')
     plt.xlabel('Turns')

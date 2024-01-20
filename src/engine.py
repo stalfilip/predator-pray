@@ -96,11 +96,22 @@ class Map:
         pb = self.play_board
         [[self.check_neighbors(x, y, pb[x][y]) for y in range(0, self.height)] for x in range(0, self.width)]
 
+        # Now each block of grass have the "opportunity" to evolve into a prey or predator, due to "mutations"
+        for x in range(self.width):
+            for y in range(self.height):
+                if pb[x][y].species == 0:
+                    random_chance = random.randint(1, 1000)
+                    if random_chance <= 1:  # 2% chance to become a predator
+                        pb[x][y].set_species(1)
+                    elif random_chance <= 3:  # Additional 5% chance to become prey
+                        pb[x][y].set_species(2)
+
     def count_species(self):
         prey = sum(node.species == 2 for row in self.play_board for node in row)
         predator = sum(node.species == 1 for row in self.play_board for node in row)
+        empty = sum(node.species == 0 for row in self.play_board for node in row)
 
-        return prey, predator
+        return empty, prey, predator
 
     # Returns the neighbors of a node, If node is on edge this wraps
     def get_neighbors(self, x, y):
@@ -134,9 +145,10 @@ class Map:
     #       -If the adjacent square is a prey:
     #            -They will eat it, turning it into a "predator" (reproducing)
     #            -Their health will increase by the amount of health the eaten prey had
+
+    
     def check_neighbors(self, x, y, node):
-        # If the node is empty no checks are performed
-        if node.species is 0:
+        if node.species == 0:
             return
 
         if node.species is 1:
