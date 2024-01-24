@@ -5,7 +5,7 @@ from threading import Thread
 import engine
 
 random.seed(None)
-size = width, height = 500, 500
+size = width, height = 1000, 1000
 play_width = width/5
 play_height = height/5
 is_stopped = False
@@ -51,6 +51,10 @@ def paint_map(board):
     for x in range(0, length):
         for y in range(0, length):
             pa(x*5, y*5, board[x][y].species)
+
+
+pygame.display.set_caption('Predator-prey')
+#screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 
 # Game loop, paints the map then calculates the next turn
 while True:

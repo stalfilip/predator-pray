@@ -3,8 +3,9 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 
 def main():
-    game_map = pps.Map()
-    num_turns = 200
+
+    game_map = pps.Map()    
+    num_turns = 2000
 
     prey_counts = []
     predator_counts = []

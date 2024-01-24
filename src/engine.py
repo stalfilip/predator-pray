@@ -1,7 +1,26 @@
 import random
 import sys
-import copy
 random.seed(None)
+
+# Initial distribution
+prey_prob = 0.999
+predator_prob = 0.0005
+grass_prob = 0.0005
+mutation_prob = 0.02
+
+# Check that probabilities sum to 1
+assert abs(prey_prob + predator_prob + grass_prob - 1) < 1e-6, "Probabilities must sum to 1"
+
+#Health distribution
+predator_health_initial = 2
+prey_health_initial = 5
+
+#Map
+width = 100
+height = 100
+
+#Reproduction dynamics
+Reproduction_Health = 6
 
 
 class Node:
@@ -11,7 +30,9 @@ class Node:
     y = None
     health = None
 
-    def __init__(self, spec=None):
+    def __init__(self, spec=None, predator_health=predator_health_initial, prey_health=prey_health_initial):
+        self.predator_health = predator_health
+        self.prey_health = prey_health
         if spec is not None:
             self.species = spec
         else:
@@ -30,9 +51,9 @@ class Node:
             if num is 0:  # Blank
                 self.health = None
             if num is 1:  # Predator
-                self.health = 2
+                self.health = self.predator_health
             if num is 2:  # Prey
-                self.health = 10
+                self.health = self.prey_health
         else:
             sys.stderr.write('Species not correct, do not do math with them.')
             self.species = 0
@@ -52,6 +73,7 @@ class Node:
 
     def prey_eat(self):
             self.species = 1
+            #Prey health is added to predator health, maintaining the total helath
 
     def prey_reproduce(self):
         self.species = 2
@@ -59,25 +81,33 @@ class Node:
 
 
 class Map:
-    height = 100
-    width = 100
     play_board = []
 
-    def __init__(self):
+    def __init__(self, width=width, height=height, mutation_prob = mutation_prob):
+
+        self.width = width
+        self.height = height
+        self.mutation_prob = mutation_prob
+
         prey = 0
         predator = 0
         empty = 0
+
+        # Sets the initial distribution
         for x in range(self.width):
             row = []
             for y in range(self.height):
-                i = random.randint(0, 10)
-                if i <= 7:
+                random_chance = random.random()  
+                if random_chance <= prey_prob:
+                    # Prey
                     row.append(Node(2))
                     prey += 1
-                elif i <= 9:
+                elif random_chance <= prey_prob + predator_prob:
+                    # Predator
                     row.append(Node(1))
                     predator += 1
                 else:
+                    # Grass
                     row.append(Node(0))
                     empty += 1
 
@@ -96,20 +126,19 @@ class Map:
         pb = self.play_board
         [[self.check_neighbors(x, y, pb[x][y]) for y in range(0, self.height)] for x in range(0, self.width)]
 
-        # Now each block of grass have the "opportunity" to evolve into a prey or predator, due to "mutations"
         for x in range(self.width):
             for y in range(self.height):
                 if pb[x][y].species == 0:
-                    random_chance = random.randint(1, 1000)
-                    if random_chance <= 1:  # 2% chance to become a predator
-                        pb[x][y].set_species(1)
-                    elif random_chance <= 3:  # Additional 5% chance to become prey
+                    random_chance = random.random()  # Generate a random float between 0 and 1
+                    if random_chance <= self.mutation_prob:  # Chance to mutate into prey
                         pb[x][y].set_species(2)
 
+
     def count_species(self):
-        prey = sum(node.species == 2 for row in self.play_board for node in row)
-        predator = sum(node.species == 1 for row in self.play_board for node in row)
-        empty = sum(node.species == 0 for row in self.play_board for node in row)
+        total_cells = self.width * self.height
+        prey = sum(node.species == 2 for row in self.play_board for node in row) / total_cells
+        predator = sum(node.species == 1 for row in self.play_board for node in row) / total_cells
+        empty = sum(node.species == 0 for row in self.play_board for node in row) / total_cells
 
         return empty, prey, predator
 
@@ -174,7 +203,7 @@ class Map:
             else:
                 target = prey[random.randint(0, (len(prey)-1))]
                 if node.health >= target.health:
-                    target.prey_eat()
+                    target.prey_eat() 
 
             if node.health is None or node.health <= 0:
                 node.species = 0
@@ -193,7 +222,7 @@ class Map:
             if node.health is None or node.health is 0:
                 node.species = 0
                 return
-            if node.health > 6 and len(open_spots) >= 1:
+            if node.health > Reproduction_Health and len(open_spots) >= 1:
                 open_spots[random.randint(0, (len(open_spots))-1)].prey_reproduce()
                 node.health = 4
                 return
