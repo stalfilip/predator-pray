@@ -3,9 +3,9 @@ import sys
 random.seed(None)
 
 # Initial distribution
-prey_prob = 0.999
-predator_prob = 0.0005
-grass_prob = 0.0005
+prey_prob = 0.9999
+predator_prob = 0.00005
+grass_prob = 0.00005
 mutation_prob = 0.02
 
 # Check that probabilities sum to 1

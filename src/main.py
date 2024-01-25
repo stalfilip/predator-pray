@@ -5,7 +5,7 @@ from datetime import datetime
 def main():
 
     game_map = pps.Map()    
-    num_turns = 2000
+    num_turns = 1000
 
     prey_counts = []
     predator_counts = []
